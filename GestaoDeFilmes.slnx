@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ProductManagement.Business/MovieManagement.Business.csproj" Id="4e06d802-9392-4f17-8796-06b7c9476737" />
+  <Project Path="ProductManagement.Data/MovieManagement.Data.csproj" Id="43303209-8186-4e65-8026-de00dc54cadc" />
+  <Project Path="ProductManagement.Domain/MovieManagement.Domain.csproj" Id="ff30270e-524c-4534-9ead-567914eb8188" />
+  <Project Path="ProductManagementUI/MovieManagementUI.csproj" Id="d0f44f59-0e1c-4ae9-9f6f-aa176c40aa0e" />
+</Solution>
