@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProductManagement.Business\MovieManagement.Business.csproj" />
+    <ProjectReference Include="..\ProductManagement.Data\MovieManagement.Data.csproj" />
+    <ProjectReference Include="..\ProductManagement.Domain\MovieManagement.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
