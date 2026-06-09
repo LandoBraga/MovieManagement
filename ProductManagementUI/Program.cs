@@ -8,11 +8,16 @@ namespace MovieManagementUI
     internal class Program
     {
         // Instanciação global atualizada para a Parte 3
-        private static readonly FilmeRepository _filmeRepository = new FilmeRepository();
-        private static readonly CategoriaRepository _categoriaRepository = new CategoriaRepository();
-        private static readonly RealizadorRepository _realizadorRepository = new RealizadorRepository();
+        //private static readonly FilmeRepository _filmeRepository = new FilmeRepository();
+        //private static readonly CategoriaRepository _categoriaRepository = new CategoriaRepository();
+        //private static readonly RealizadorRepository _realizadorRepository = new RealizadorRepository();
+                
+        
+        private static readonly CategoriaSqLiteRepository _categoriaRepository = new CategoriaSqLiteRepository();
+        private static readonly RealizadorSqLiteRepository _realizadorRepository = new RealizadorSqLiteRepository();
+        private static readonly FilmeSqLiteRepository _filmeRepository = new FilmeSqLiteRepository();
 
-        // Passamos os 3 repositórios para o MovieService
+        // O serviço recebe os novos repositórios automaticamente através das interfaces
         private static readonly MovieService _movieService = new MovieService(_filmeRepository, _categoriaRepository, _realizadorRepository);
 
         private static readonly CategoriaService _categoriaService = new CategoriaService(_categoriaRepository);
