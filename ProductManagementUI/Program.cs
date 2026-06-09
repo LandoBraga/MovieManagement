@@ -7,14 +7,15 @@ namespace MovieManagementUI
 {
     internal class Program
     {
-        // Instanciação global dos repositórios e serviços em memória
+        // Instanciação global atualizada para a Parte 3
         private static readonly FilmeRepository _filmeRepository = new FilmeRepository();
-        private static readonly MovieService _movieService = new MovieService(_filmeRepository);
-
         private static readonly CategoriaRepository _categoriaRepository = new CategoriaRepository();
-        private static readonly CategoriaService _categoriaService = new CategoriaService(_categoriaRepository);
-
         private static readonly RealizadorRepository _realizadorRepository = new RealizadorRepository();
+
+        // Passamos os 3 repositórios para o MovieService
+        private static readonly MovieService _movieService = new MovieService(_filmeRepository, _categoriaRepository, _realizadorRepository);
+
+        private static readonly CategoriaService _categoriaService = new CategoriaService(_categoriaRepository);
         private static readonly RealizadorService _realizadorService = new RealizadorService(_realizadorRepository);
 
         static void Main(string[] args)
@@ -91,19 +92,47 @@ namespace MovieManagementUI
                             Console.Write("Classificação (0 a 5): ");
                             int classificacao = int.Parse(Console.ReadLine() ?? "-1");
 
-                            _movieService.AdicionarFilme(titulo, ano, lingua, classificacao);
+                            // Mostrar categorias disponíveis para ajudar o utilizador
+                            Console.WriteLine("\n--- Categorias Disponíveis ---");
+                            var cats = _categoriaService.ListarTodas();
+                            if (cats.Count == 0) Console.WriteLine("⚠️ Nenhuma categoria registada! Crie uma primeiro.");
+                            foreach (var c in cats) Console.WriteLine($"ID: {c.Id} | Nome: {c.Nome}");
+
+                            Console.Write("Escolha o ID da Categoria: ");
+                            int categoriaId = int.Parse(Console.ReadLine() ?? "0");
+
+                            // Mostrar realizadores disponíveis para ajudar o utilizador
+                            Console.WriteLine("\n--- Realizadores Disponíveis ---");
+                            var reals = _realizadorService.ListarTodos();
+                            if (reals.Count == 0) Console.WriteLine("⚠️ Nenhum realizador registado! Crie um primeiro.");
+                            foreach (var r in reals) Console.WriteLine($"ID: {r.Id} | Nome: {r.Nome}");
+
+                            Console.Write("Escolha o ID do Realizador: ");
+                            int realizadorId = int.Parse(Console.ReadLine() ?? "0");
+
+                            // Enviar todos os dados para o serviço (incluindo os IDs das relações)
+                            _movieService.AdicionarFilme(titulo, ano, lingua, classificacao, categoriaId, realizadorId);
                             Console.WriteLine("\nFilme adicionado com sucesso!");
                             break;
 
                         case "2":
                             Console.Clear();
-                            Console.WriteLine("--- Lista de Filmes Catálogados ---");
+                            Console.WriteLine("--- Lista de Filmes Catalogados ---");
                             var lista = _movieService.ListarTodos();
                             if (lista.Count == 0) Console.WriteLine("Nenhum filme registado.");
                             else
                             {
                                 foreach (var f in lista)
-                                    Console.WriteLine($"ID: {f.Id} | {f.Titulo} ({f.Ano}) - {f.Lingua} | Nota: {f.Classificacao}/5");
+                                {
+                                    // Procurar os nomes associados aos IDs
+                                    var cat = _categoriaService.ProcurarPorId(f.CategoriaId);
+                                    var real = _realizadorService.ProcurarPorId(f.RealizadorId);
+
+                                    string nomeCategoria = cat != null ? cat.Nome : "Desconhecida";
+                                    string nomeRealizador = real != null ? real.Nome : "Desconhecido";
+
+                                    Console.WriteLine($"ID: {f.Id} | {f.Titulo} ({f.Ano}) | Categoria: {nomeCategoria} | Realizador: {nomeRealizador} | Nota: {f.Classificacao}/5");
+                                }
                             }
                             break;
 

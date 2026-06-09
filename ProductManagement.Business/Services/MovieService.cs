@@ -7,14 +7,23 @@ namespace MovieManagement.Business.Services
 {
     public class MovieService
     {
-        private readonly IFilmeRepository _repositorio;
+        private readonly IFilmeRepository _filmeRepository;
+        private readonly ICategoriaRepository _categoriaRepository;
+        private readonly IRealizadorRepository _realizadorRepository;
 
-        public MovieService(IFilmeRepository repositorio)
+        // Atualizado o construtor para receber os 3 repositórios
+        public MovieService(
+            IFilmeRepository filmeRepository,
+            ICategoriaRepository categoriaRepository,
+            IRealizadorRepository realizadorRepository)
         {
-            _repositorio = repositorio;
+            _filmeRepository = filmeRepository;
+            _categoriaRepository = categoriaRepository;
+            _realizadorRepository = realizadorRepository;
         }
 
-        public void AdicionarFilme(string titulo, int ano, string lingua, int classificacao)
+        // Método atualizado com CategoriaId e RealizadorId
+        public void AdicionarFilme(string titulo, int ano, string lingua, int classificacao, int categoriaId, int realizadorId)
         {
             if (string.IsNullOrWhiteSpace(titulo))
                 throw new Exception("O título do filme é obrigatório.");
@@ -25,7 +34,18 @@ namespace MovieManagement.Business.Services
             if (ano < 1888 || ano > DateTime.Now.Year + 2)
                 throw new Exception("Insira um ano de lançamento válido.");
 
-            Filme? filmeExistente = _repositorio.ObterPorTitulo(titulo);
+            // 1. REGRA DA PARTE 3: Validar se a Categoria existe
+            var categoriaExistente = _categoriaRepository.ObterPorId(categoriaId);
+            if (categoriaExistente == null)
+                throw new Exception($"A categoria com o ID {categoriaId} não existe no sistema.");
+
+            // 2. REGRA DA PARTE 3: Validar se o Realizador existe
+            var realizadorExistente = _realizadorRepository.ObterPorId(realizadorId);
+            if (realizadorExistente == null)
+                throw new Exception($"O realizador com o ID {realizadorId} não existe no sistema.");
+
+            // Validar se já existe um filme com o mesmo título
+            Filme? filmeExistente = _filmeRepository.ObterPorTitulo(titulo);
             if (filmeExistente != null)
                 throw new Exception("Já existe um filme com este título.");
 
@@ -34,25 +54,27 @@ namespace MovieManagement.Business.Services
                 Titulo = titulo.Trim(),
                 Ano = ano,
                 Lingua = lingua,
-                Classificacao = classificacao
+                Classificacao = classificacao,
+                CategoriaId = categoriaId,   // Gravando a relação
+                RealizadorId = realizadorId    // Gravando a relação
             };
 
-            _repositorio.Adicionar(novoFilme);
+            _filmeRepository.Adicionar(novoFilme);
         }
 
         public List<Filme> ListarTodos()
         {
-            return _repositorio.ObterTodos();
+            return _filmeRepository.ObterTodos();
         }
 
         public Filme? ProcurarPorTitulo(string titulo)
         {
-            return _repositorio.ObterPorTitulo(titulo);
+            return _filmeRepository.ObterPorTitulo(titulo);
         }
 
         public void RemoverFilme(int id)
         {
-            bool removido = _repositorio.Remover(id);
+            bool removido = _filmeRepository.Remover(id);
             if (!removido)
                 throw new Exception("Filme não encontrado.");
         }
